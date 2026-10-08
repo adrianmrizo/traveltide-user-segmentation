@@ -27,6 +27,11 @@ Cohort: **189,432 users** with 5 or more sessions — 19% of the user base, but
 | No Purchase | 20,119 | 10.6% | 0.0% | Exclusive discounts |
 | Trips Without Revenue | 3,364 | 1.8% | 0.0% | No cancellation fees |
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="reports/figures/segment_value_dark.png">
+  <img alt="Share of users against share of revenue for each of the six segments" src="reports/figures/segment_value_light.png">
+</picture>
+
 Full figures per segment: [`data/processed/segment_summary.csv`](data/processed/segment_summary.csv).
 
 **Key insights**
@@ -61,7 +66,10 @@ Full figures per segment: [`data/processed/segment_summary.csv`](data/processed/
 │   └── README.md                                        # data dictionary & reproduction
 ├── reports/
 │   ├── executive_summary.pdf
-│   └── detailed_report.pdf
+│   ├── detailed_report.pdf
+│   └── figures/                                         # README charts, light + dark
+├── scripts/
+│   └── make_figures.py                                  # regenerates every figure
 ├── requirements.txt
 └── LICENSE
 ```
@@ -85,6 +93,11 @@ retained. **`total_sessions >= 5`** keeps 19% of users and 25% of cumulative
 revenue — the point where the cohort stays small enough to target and still
 carries meaningful spend.
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="reports/figures/cohort_cutoff_dark.png">
+  <img alt="Share of users and share of revenue retained at each minimum session count" src="reports/figures/cohort_cutoff_light.png">
+</picture>
+
 ### 3. Rule-based segmentation
 Three groups are defined by business rules, because their behaviour makes
 distance-based clustering meaningless:
@@ -94,10 +107,30 @@ distance-based clustering meaningless:
 - **High Value** — top 5% by total revenue
 
 ### 4. Machine-learning segmentation
-The remaining users were scaled, reduced with **PCA** and clustered with
-**KMeans** (*k* chosen from elbow and silhouette scores), yielding three
-behavioural segments: Premium Long-Haul, High-Friction Family and Low-Activity
-Leisure.
+The remaining 157,652 users were standardised across all 28 behavioural
+features, reduced with **PCA to 14 components** (90.7% of the variance) and
+clustered with **KMeans at k = 3**.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="reports/figures/k_selection_dark.png">
+  <img alt="Elbow and silhouette curves across k, with k = 3 marked" src="reports/figures/k_selection_light.png">
+</picture>
+
+Two earlier approaches were tried and rejected: three hand-built composite
+indices lost too much signal, and **DBSCAN** formed no valid clusters on this
+data at any of the representations tested. KMeans on the raw scaled features
+scored a silhouette of 0.15 against 0.17 after the PCA step.
+
+The elbow puts k at 3; the silhouette curve is flat and weak across the whole
+range, so it neither confirms nor contradicts that choice. The separation these
+segments have is modest — worth stating plainly, since the business value here
+comes from the segments being *actionable*, not from them being geometrically
+tidy.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="reports/figures/pca_clusters_dark.png">
+  <img alt="The three clustered segments shown as small multiples in PCA space" src="reports/figures/pca_clusters_light.png">
+</picture>
 
 ### 5. Perk assignment
 Each segment was profiled on conversion, cancellation, trip composition and
