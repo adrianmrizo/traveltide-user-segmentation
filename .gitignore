@@ -1,0 +1,79 @@
+# ---------------------------------------------------------------------------
+# Data
+# ---------------------------------------------------------------------------
+# Raw and intermediate datasets are not versioned: they are reproducible by
+# running the queries in sql/ against the TravelTide database.
+# Only small, aggregated outputs are tracked (whitelisted below).
+data/raw/*
+!data/raw/.gitkeep
+
+data/processed/*
+!data/processed/.gitkeep
+!data/processed/booking_rate.csv
+!data/processed/cumulative_revenue_per_sessions.csv
+!data/processed/cutoff_criteria_summary.csv
+!data/processed/segment_summary.csv
+
+# Per-segment user lists (large, contain user-level records)
+data/processed/segments/
+
+# ---------------------------------------------------------------------------
+# Reports
+# ---------------------------------------------------------------------------
+# Slide decks are ~32 MB each; the PDF reports in reports/ cover the same
+# content and are the versioned deliverables.
+*.pptx
+reports/archive/
+
+# ---------------------------------------------------------------------------
+# Python
+# ---------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*.egg-info/
+.Python
+build/
+dist/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# ---------------------------------------------------------------------------
+# Jupyter
+# ---------------------------------------------------------------------------
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/*
+.jupyter/
+
+# ---------------------------------------------------------------------------
+# Tooling / IDE
+# ---------------------------------------------------------------------------
+.vscode/
+.idea/
+*.swp
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+
+# ---------------------------------------------------------------------------
+# Credentials
+# ---------------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+*.pem
+secrets.*
+
+# ---------------------------------------------------------------------------
+# OS
+# ---------------------------------------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+desktop.ini
