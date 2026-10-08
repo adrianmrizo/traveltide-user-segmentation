@@ -56,7 +56,7 @@ the segmentation. One row per user in the cohort (`total_sessions >= 5`).
 | `total_trips`, `completed_trips` | Booked trips and non-cancelled trips |
 | `trips_per_session` | Booking frequency |
 | `total_revenue`, `avg_revenue_per_trip`, `revenue_per_session` | Monetary value (USD) |
-| `avg_lead_time` | Mean days between booking and departure |
+| `avg_lead_time` | Mean time between booking and departure, as a PostgreSQL interval string (`6 days 22:15:49`) — see the caveat below |
 | `avg_trip_duration` | Mean trip length in days |
 | `seats`, `checked_bags`, `rooms`, `nights` | Mean booking composition |
 | `cancel_rate` | Share of cancelled trips |
@@ -81,6 +81,25 @@ the segment profiles in the reports.
 Cohort diagnostics by session count: users, trips, cancellation rate, average
 revenue per user, booking rate and cumulative revenue share. These support the
 `total_sessions >= 5` cutoff.
+
+## Known caveat: `avg_lead_time`
+
+The query exports `avg_lead_time` as a PostgreSQL interval string rather than a
+number. The segmentation notebook coerces its feature matrix with
+`pd.to_numeric(errors="coerce")` and imputes with `0`, so every lead-time value
+became zero and the column carried **no signal into the clustering** — a
+constant feature that `StandardScaler` zeroes out entirely.
+
+The published segments are unaffected in the sense that they are exactly what
+the notebook produced, and the reports describe them correctly. But anyone
+rebuilding this analysis should parse the interval first:
+
+```python
+df["avg_lead_time"] = pd.to_timedelta(df["avg_lead_time"]).dt.total_seconds() / 86400
+```
+
+Booking lead time is a plausible discriminator between planners and
+last-minute bookers, so this is the first thing worth revisiting.
 
 ## Privacy
 
